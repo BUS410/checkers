@@ -3,6 +3,7 @@ from pygame.mouse import (get_pos as get_mouse_pos,
 from pygame.event import get as get_events
 from pygame.surface import Surface
 from pygame.rect import Rect
+from pygame.font import SysFont
 from pygame import MOUSEBUTTONDOWN, MOUSEBUTTONUP
 
 class Widget:
@@ -15,9 +16,17 @@ class Widget:
 		self.background_color = kwargs.get('background_color', (0, 0, 0))
 		self.background_color_cover = kwargs.get('background_color_cover', (0, 0, 0))
 		self.background_color_click = kwargs.get('background_color_click', (0, 0, 0))
+		self.text = kwargs.get('text', '')
+		self.font_size = kwargs.get('font_size', 20)
+		self.font_color = kwargs.get('font_color', (255, 255, 255))
+		self.font = SysFont('calibri', self.font_size, 1)
 		self.image.fill(self.background_color)
 
 	def show(self, surface):
+		font = self.font.render(self.text, 1, self.font_color)
+		pos = ((self.rect.width - font.get_rect().width)//2,
+			(self.rect.height - font.get_rect().height)//2)
+		self.image.blit(font, pos)
 		surface.blit(self.image, (self.rect.x, self.rect.y))
 
 	def _onclick(self):
@@ -34,17 +43,6 @@ class Widget:
 		else:
 			self.image.fill(self.background_color)
 
-class Label(Widget):
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-
-class Button(Widget):
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
-
-class CheckBox(Widget):
-	def __init__(self, **kwargs):
-		super().__init__(**kwargs)
 
 def test():
 	import pygame as pg
@@ -56,8 +54,8 @@ def test():
 	FPS = 60
 	clock = pg.time.Clock()
 
-	widget = Widget(x = 50, y = 50, background_color=(255, 255, 255),
-					background_color_cover = (128, 128, 128))
+	widget = Widget(x = 50, y = 50, background_color=(156, 156, 156),
+					background_color_cover = (128, 128, 128), text='text')
 
 	while run:
 		events = pg.event.get()
