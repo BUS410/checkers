@@ -21,6 +21,7 @@ class Widget:
 		self.font_color = kwargs.get('font_color', (255, 255, 255))
 		self.font = SysFont('calibri', self.font_size, 1)
 		self.image.fill(self.background_color)
+		self.onclick = kwargs.get('onclick', lambda instance : None)
 
 	def show(self, surface):
 		font = self.font.render(self.text, 1, self.font_color)
@@ -30,7 +31,7 @@ class Widget:
 		surface.blit(self.image, (self.rect.x, self.rect.y))
 
 	def _onclick(self):
-		pass
+		self.onclick(self)
 
 	def update(self, events):
 		if self.rect.collidepoint(*get_mouse_pos()) and get_mouse_pressed()[0]:
@@ -54,7 +55,10 @@ def test():
 	FPS = 60
 	clock = pg.time.Clock()
 
-	widget = Widget(x = 50, y = 50, background_color=(156, 156, 156),
+	def click(instance):
+		instance.text = 'Hello world'
+
+	widget = Widget(x = 50, y = 50, background_color=(156, 156, 156), onclick=click,
 					background_color_cover = (128, 128, 128), text='text')
 
 	while run:
