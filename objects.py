@@ -36,17 +36,10 @@ class Checker:
 		self.pos = pos
 		self.color = color
 		self.state = 'normal'
-		self.king = False
 
 	def draw(self, surface):
 		pos = (self.pos[0]*CELLS_SIZE+CELLS_SIZE//2, self.pos[1]*CELLS_SIZE+CELLS_SIZE//2)
 		circle(surface, (58, 228, 233) if self.state == 'selected' else self.color, pos, CELLS_SIZE//2)
-		if self.king:
-			if self.color == (255, 255, 255):
-				color = (self.color[0]-32, self.color[1]-32, self.color[2]-32)
-			else:
-				color = (self.color[0]+32, self.color[1]+32, self.color[2]+32)
-			circle(surface, color, pos, CELLS_SIZE//3)
 
 
 		
