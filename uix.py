@@ -49,39 +49,3 @@ class Widget:
 		else:
 			self.image.fill(self.background_color)
 
-
-def test():
-	import pygame as pg
-	pg.init()
-	
-	window = pg.display.set_mode((800, 600))
-
-	run = True
-	FPS = 60
-	clock = pg.time.Clock()
-
-	def click(instance):
-		instance.text = 'Hello world'
-
-	widget = Widget(width = 800//2, height = 480//2, background_color_cover=(156, 156, 156),
-					background_color = (128, 128, 128), text='text', font_size=50,
-					onclick=click, background_color_click = (0, 240, 240))
-
-	while run:
-		events = pg.event.get()
-		for event in events:
-			if event.type == pg.QUIT:
-				run = False
-		keys = pg.key.get_pressed()
-		if keys[pg.K_ESCAPE]:
-			run = False
-
-		window.fill((0, 0, 0))
-		widget.update(events)
-		widget.show(window)
-		pg.display.update()
-		clock.tick(FPS)
-	pg.quit()
-
-if __name__ == '__main__':
-	test()

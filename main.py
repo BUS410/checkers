@@ -62,6 +62,8 @@ class Program:
 	def reset(self, instance):
 		self.checkers.reset_pos_checkers()
 		self.step = (255, 255, 255)
+		self.score_white = 0
+		self.score_black = 0
 		for cell in self.board:
 			cell.state = 'normal'
 
@@ -97,15 +99,15 @@ class Program:
 								(selected.pos[0]-1, selected.pos[1]+1),
 							]
 
-							for vp in temp_valid_steps:
-								if not (8 in vp or -1 in vp or vp in poses):
-									valid_steps.append(vp)
-								if vp in poses:
+							for vs in temp_valid_steps:
+								if not (8 in vs or -1 in vs or vs in poses):
+									valid_steps.append(vs)
+								if vs in poses:
 									for checker in self.checkers:
-										if checker.pos == vp and checker.color!=selected.color:
+										if checker.pos == vs and checker.color!=selected.color:
 											pos = ((
-													selected.pos[0]-(selected.pos[0]-vp[0])*2,
-													selected.pos[1]-(selected.pos[1]-vp[1])*2,
+													selected.pos[0]-(selected.pos[0]-vs[0])*2,
+													selected.pos[1]-(selected.pos[1]-vs[1])*2,
 												))
 											if pos not in poses:
 												valid_steps.append(pos)
@@ -119,16 +121,88 @@ class Program:
 									cell.state = 'normal'
 						else: # if click on cell
 
+							pos = None
+
 							for cell in self.board:
 								cell_pos = (cell.rect.x//64, cell.rect.y//64)
 								if cell_pos == temp_pos:
 									if cell.state == 'selected':
+										difference = (
+											(self.selected.pos[0]-cell_pos[0]),
+											(self.selected.pos[1]-cell_pos[1]),
+										)
+
+										if 2 in difference or -2 in difference:
+											pos = (
+												self.selected.pos[0]-difference[0]//2,
+												self.selected.pos[1]-difference[1]//2
+											)
+											for checker in self.checkers:
+												if checker.pos == pos:
+													remove_this = checker
+											self.checkers.remove(remove_this)
+											
+
 										self.selected.move_to(cell_pos)
-										
+
 										if self.step == (255, 255, 255):
 											self.step = (0, 0, 0)
 										elif self. step == (0, 0, 0):
 											self.step = (255, 255, 255)
+
+							if pos:
+								if self.step == (0, 0, 0):
+									self.score_white += 1
+								else:
+									self.score_black += 1
+
+								try:
+									temp_valid_steps_1 = [
+										(self.selected.pos[0]+1, self.selected.pos[1]+1),
+										(self.selected.pos[0]-1, self.selected.pos[1]-1),
+										(self.selected.pos[0]+1, self.selected.pos[1]-1),
+										(self.selected.pos[0]-1, self.selected.pos[1]+1),
+									]
+
+									temp_valid_steps_2 = [
+										(self.selected.pos[0]+2, self.selected.pos[1]+2),
+										(self.selected.pos[0]-2, self.selected.pos[1]-2),
+										(self.selected.pos[0]+2, self.selected.pos[1]-2),
+										(self.selected.pos[0]-2, self.selected.pos[1]+2),
+									]
+
+									poses = []
+									poses_all = []
+									valid_steps = []
+									for checker in self.checkers:
+										if checker.color != self.selected.color:
+											poses.append(checker.pos)
+										poses_all.append(checker.pos)
+
+									for vs1, vs2 in zip(temp_valid_steps_1, temp_valid_steps_2):
+										if vs1 in poses and vs2 not in poses_all:
+											valid_steps.append(vs2)
+
+
+
+									print(valid_steps)
+
+									if valid_steps:
+										if self.step == (255, 255, 255):
+											self.step = (0, 0, 0)
+										elif self. step == (0, 0, 0):
+											self.step = (255, 255, 255)
+										for vs in valid_steps:
+											cell_pos = (cell.rect.x//64, cell.rect.y//64)
+											for cell in self.board:
+												if cell_pos in valid_steps:
+													cell.state = 'selected'
+
+
+								except Exception as e: # if selected not found 
+									print(e)
+
+							
 
 							for cell in self.board:
 								cell.state = 'normal'
