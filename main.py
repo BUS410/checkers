@@ -38,7 +38,9 @@ class Program:
 
 	def draw(self):
 		self.window.fill((0, 0, 0))
-		self.board.draw(self.window)
+		
+		for cell in self.board:
+			cell.draw(self.window)
 
 		for widget in self.widgets:
 			widget.show(self.window)
@@ -59,6 +61,9 @@ class Program:
 
 	def reset(self, instance):
 		self.checkers.reset_pos_checkers()
+		self.step = (255, 255, 255)
+		for cell in self.board:
+			cell.state = 'normal'
 
 	def run(self):
 		self.stop = False
@@ -71,34 +76,65 @@ class Program:
 					self.stop = True
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					pos = pygame.mouse.get_pos()
+					temp_pos = (pos[0]//64, pos[1]//64)
 					if pos[0] < 512:
-						temp_pos = (pos[0]//64, pos[1]//64)
 						poses = []
 						selected = None
 						for checker in self.checkers:
 							poses.append(checker.pos)
 							if checker.pos == temp_pos and self.step == checker.color:
 								checker.state = 'selected'
-								print('selected pos', checker.pos)
 								selected = checker
 							else:
 								checker.state = 'normal'
 
 						if selected:
-							valid_steps = [
+							valid_steps = []
+							temp_valid_steps = [
 								(selected.pos[0]+1, selected.pos[1]+1),
 								(selected.pos[0]-1, selected.pos[1]-1),
 								(selected.pos[0]+1, selected.pos[1]-1),
 								(selected.pos[0]-1, selected.pos[1]+1),
 							]
 
-							for vp in valid_steps:
+							for vp in temp_valid_steps:
+								if not (8 in vp or -1 in vp or vp in poses):
+									valid_steps.append(vp)
 								if vp in poses:
-									valid_steps.remove(vp)
+									for checker in self.checkers:
+										if checker.pos == vp and checker.color!=selected.color:
+											pos = ((
+													selected.pos[0]-(selected.pos[0]-vp[0])*2,
+													selected.pos[1]-(selected.pos[1]-vp[1])*2,
+												))
+											if pos not in poses:
+												valid_steps.append(pos)
 
-							print(valid_steps)
+
+
+							for cell in self.board:
+								if (cell.rect.x//64, cell.rect.y//64) in valid_steps:
+									cell.state = 'selected'
+								else:
+									cell.state = 'normal'
+						else: # if click on cell
+
+							for cell in self.board:
+								cell_pos = (cell.rect.x//64, cell.rect.y//64)
+								if cell_pos == temp_pos:
+									if cell.state == 'selected':
+										self.selected.move_to(cell_pos)
+										
+										if self.step == (255, 255, 255):
+											self.step = (0, 0, 0)
+										elif self. step == (0, 0, 0):
+											self.step = (255, 255, 255)
+
+							for cell in self.board:
+								cell.state = 'normal'
 
 						poses.clear()
+						self.selected = selected
 						selected = None
 
 
