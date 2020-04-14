@@ -1,6 +1,6 @@
 import pygame
 
-from objects import Board
+from objects import Board, GroupChecker
 from uix import Widget
 
 RESOLUTION = (512+128, 512)
@@ -14,6 +14,9 @@ class Program:
 		self.window = pygame.display.set_mode(RESOLUTION)
 		self.clock = pygame.time.Clock()
 		self.board = Board()
+		self.checkers = GroupChecker()
+		self.checkers.reset_pos_checkers()
+		self.step = (255, 255, 255)
 		self.widgets = [
 			Widget(x=512, y=0, width=128, height=96, text='Reset', font_size=30,
 				background_color=(255, 175, 88), background_color_cover=(255, 195, 131),
@@ -40,6 +43,9 @@ class Program:
 		for widget in self.widgets:
 			widget.show(self.window)
 
+		for checker in self.checkers:
+			checker.draw(self.window)
+
 
 		self.scores[0].text = str(self.score_black)
 		self.scores[1].text = str(self.score_white)
@@ -52,7 +58,7 @@ class Program:
 		self.stop = True
 
 	def reset(self, instance):
-		pass
+		self.checkers.reset_pos_checkers()
 
 	def run(self):
 		self.stop = False
@@ -63,6 +69,38 @@ class Program:
 			for event in events:
 				if event.type == pygame.QUIT:
 					self.stop = True
+				if event.type == pygame.MOUSEBUTTONDOWN:
+					pos = pygame.mouse.get_pos()
+					if pos[0] < 512:
+						temp_pos = (pos[0]//64, pos[1]//64)
+						poses = []
+						selected = None
+						for checker in self.checkers:
+							poses.append(checker.pos)
+							if checker.pos == temp_pos and self.step == checker.color:
+								checker.state = 'selected'
+								print('selected pos', checker.pos)
+								selected = checker
+							else:
+								checker.state = 'normal'
+
+						if selected:
+							valid_steps = [
+								(selected.pos[0]+1, selected.pos[1]+1),
+								(selected.pos[0]-1, selected.pos[1]-1),
+								(selected.pos[0]+1, selected.pos[1]-1),
+								(selected.pos[0]-1, selected.pos[1]+1),
+							]
+
+							for vp in valid_steps:
+								if vp in poses:
+									valid_steps.remove(vp)
+
+							print(valid_steps)
+
+						poses.clear()
+						selected = None
+
 
 			for widget in self.widgets:
 				widget.update(events)
