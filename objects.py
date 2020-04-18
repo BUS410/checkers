@@ -30,6 +30,7 @@ class Cell(Sprite):
 			self.image.fill(VALID_COLOR)
 		surface.blit(self.image, (self.rect.x, self.rect.y))
 
+
 class Checker:
 
 	def __init__(self, color, pos):
@@ -41,11 +42,9 @@ class Checker:
 		pos = (self.pos[0]*CELLS_SIZE+CELLS_SIZE//2, self.pos[1]*CELLS_SIZE+CELLS_SIZE//2)
 		circle(surface, (58, 228, 233) if self.state == 'selected' else self.color, pos, CELLS_SIZE//2)
 
-
-		
-
 	def move_to(self, pos):
 		self.pos = pos
+
 
 class Board(Group):
 

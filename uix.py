@@ -22,7 +22,7 @@ class Widget:
 		self.font_size = kwargs.get('font_size', 20)
 		self.font_color = kwargs.get('font_color', (255, 255, 255))
 		self.font_pos = kwargs.get('font_pos', None)
-		self.font = SysFont('consolas', self.font_size, 1)
+		self.font = SysFont('calibri', self.font_size, 1)
 		self.image.fill(self.background_color)
 		self.onclick = kwargs.get('onclick', lambda instance : None)
 

@@ -9,9 +9,9 @@ FPS = 60
 class Program:
 	def __init__(self):
 		pygame.init()
-		pygame.font.init()
 
 		self.window = pygame.display.set_mode(RESOLUTION)
+		pygame.display.set_caption('ТНН шашки')
 		self.clock = pygame.time.Clock()
 		self.board = Board()
 		self.checkers = GroupChecker()
@@ -181,7 +181,8 @@ class Program:
 
 									for vs1, vs2 in zip(temp_valid_steps_1, temp_valid_steps_2):
 										if vs1 in poses and vs2 not in poses_all:
-											valid_steps.append(vs2)
+											if -1 not in vs2 and 8 not in vs2:
+												valid_steps.append(vs2)
 
 
 
